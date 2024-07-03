@@ -14,6 +14,7 @@ This is a Node.js-based Image Processing API that allows you to perform various 
 Missing
 
 - Many other things from the sharp package https://sharp.pixelplumbing.com/
+- Needs a refactor, made this in ~2 hours
 
 ## Prerequisites
 
