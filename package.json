@@ -1,0 +1,31 @@
+{
+	"name": "image-api",
+	"version": "1.0.0",
+	"main": "index.js",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"start": "node server.js",
+		"dev": "nodemon server.js",
+		"biome:check": "npx @biomejs/biome check --write index.js",
+		"biome:format": "npx @biomejs/biome format --write"
+	},
+	"author": "Bjarne Oeverli",
+	"license": "MIT",
+	"description": "a simple Image API with Express.js",
+	"dependencies": {
+		"cors": "^2.8.5",
+		"express": "^4.19.2",
+		"file-type": "^19.0.0",
+		"joi": "^17.13.3",
+		"multer": "^1.4.5-lts.1",
+		"sharp": "^0.33.4",
+		"swagger-jsdoc": "^6.2.8",
+		"swagger-ui-express": "^5.0.1",
+		"yamljs": "^0.3.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.8.3",
+		"nodemon": "^3.1.4"
+	}
+}

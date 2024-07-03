@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Processor and Cropper</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropper/4.1.0/cropper.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      #image-container {
+        max-width: 500px;
+        max-height: 500px;
+        margin: 20px 0;
+      }
+      #resultImage {
+        max-width: 100%;
+        margin-top: 20px;
+      }
+      #resultInfo {
+        margin-top: 20px;
+      }
+      button {
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Processor and Cropper</h1>
+    <input type="file" id="imageInput" accept="image/*" />
+    <div id="image-container">
+      <img id="image" src="" alt="Image to crop" />
+    </div>
+    <button id="cropButton">Crop Image</button>
+    <button id="processButton" style="display: none">Process Image</button>
+    <div id="resultInfo"></div>
+    <img id="resultImage" alt="Processed Image" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script>
+      const imageInput = document.getElementById("imageInput");
+      const image = document.getElementById("image");
+      const cropButton = document.getElementById("cropButton");
+      const processButton = document.getElementById("processButton");
+      const resultImage = document.getElementById("resultImage");
+      const resultInfo = document.getElementById("resultInfo");
+      let cropper;
+      let croppedBlob;
+
+      imageInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          image.src = event.target.result;
+          if (cropper) {
+            cropper.destroy();
+          }
+          cropper = new Cropper(image, {
+            //aspectRatio: 1,
+            viewMode: 1,
+            minCropBoxWidth: 200,
+            minCropBoxHeight: 200,
+          });
+          cropButton.style.display = "inline-block";
+          processButton.style.display = "none";
+        };
+        reader.readAsDataURL(file);
+      });
+
+      cropButton.addEventListener("click", () => {
+        const croppedCanvas = cropper.getCroppedCanvas();
+        if (croppedCanvas) {
+          croppedCanvas.toBlob((blob) => {
+            croppedBlob = blob;
+            processButton.style.display = "inline-block";
+          });
+        }
+      });
+
+      async function processImage(imageBlob, options) {
+        const formData = new FormData();
+        formData.append("image", imageBlob, "cropped_image.jpg");
+
+        if (options.rotate) formData.append("rotate", options.rotate);
+        if (options.resize)
+          formData.append("resize", JSON.stringify(options.resize));
+        if (options.format) formData.append("format", options.format);
+        if (options.quality) formData.append("quality", options.quality);
+
+        try {
+          const response = await fetch("http://localhost:3003/image", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log("Image processed successfully:", result);
+          return result;
+        } catch (error) {
+          console.error("Error processing image:", error);
+          throw error;
+        }
+      }
+
+      processButton.addEventListener("click", async () => {
+        if (croppedBlob) {
+          try {
+            const result = await processImage(croppedBlob, {
+              rotate: 180,
+              /*resize: {
+                width: 300,
+                height: 300,
+                fit: "cover",
+                position: "center",
+              },*/
+              format: "webp",
+              quality: 80,
+            });
+
+            // Display the processed image
+            resultImage.src = `http://localhost:3003/image/${result.image}`;
+
+            // Display image information
+            resultInfo.innerHTML = `
+                        <p>Size: ${result.size} bytes</p>
+                        <p>Width: ${result.width}px</p>
+                        <p>Height: ${result.height}px</p>
+                    `;
+          } catch (error) {
+            console.error("Failed to process image:", error);
+            resultInfo.innerHTML = `<p>Error: ${error.message}</p>`;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

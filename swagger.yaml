@@ -1,0 +1,106 @@
+openapi: 3.0.0
+info:
+  title: Image API
+  version: 1.0.0
+  description: API for processing and caching images
+
+servers:
+  - url: http://localhost:3003
+
+paths:
+  /image:
+    post:
+      summary: Process and cache an image
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                rotate:
+                  type: integer
+                  minimum: 0
+                  maximum: 360
+                resize:
+                  type: object
+                  properties:
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                    fit:
+                      type: string
+                      enum: [cover, contain, fill, inside, outside]
+                    position:
+                      type: string
+                crop:
+                  type: object
+                  properties:
+                    left:
+                      type: integer
+                      minimum: 0
+                    top:
+                      type: integer
+                      minimum: 0
+                    width:
+                      type: integer
+                    height:
+                      type: integer
+                format:
+                  type: string
+                  enum: [jpeg, png, webp, jpg, avif, gif]
+                quality:
+                  type: integer
+                  minimum: 1
+                  maximum: 100
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  state:
+                    type: string
+                  path:
+                    type: string
+                  key:
+                    type: string
+                  format:
+                    type: string
+                  image:
+                    type: string
+                  size:
+                    type: integer
+                  width:
+                    type: integer
+                  height:
+                    type: integer
+        "400":
+          description: Bad request
+        "500":
+          description: Internal server error
+
+  /image/{image}:
+    get:
+      summary: Retrieve a processed image
+      parameters:
+        - in: path
+          name: image
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Image not found
