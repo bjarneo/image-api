@@ -31,6 +31,14 @@ npm run dev
 // http://localhost:3003
 ```
 
+## Docker
+
+```bash
+docker run -it --rm --name image-api -p 3003:3003 \
+  -v $(pwd)/image-api-cache:/usr/src/app/cache \ # Remember to mount the image cache directory
+  -d bjarneo/image-api
+```
+
 ## API Endpoints
 
 See swagger documentation at http://localhost:3003/api-docs
