@@ -181,6 +181,9 @@ app.use(
 );
 
 // --- Routes ---
+app.get("/", (_, res) =>
+	res.sendFile(path.join(__dirname, "examples/example2.html")),
+);
 app.post("/image", upload.single("image"), handleImageProcessing);
 
 app.get("/image/:image", async (req, res) => {
