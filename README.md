@@ -32,10 +32,15 @@ npm run dev
 // http://localhost:3003
 ```
 
+## Environment Variables
+
+`CORS_ORIGIN` - The origin that is allowed to access the API. Default is `*`. For multiple origins, separate them with a comma. I.e. `http://localhost:3000,http://localhost:3001`
+
 ## Docker
 
 ```bash
 docker run -it --rm --name image-api -p 3003:3003 \
+  -env CORS_ORIGIN=http://localhost:3000 \ # Remember to set the CORS_ORIGIN
   -v $(pwd)/image-api-cache:/usr/src/app/cache \ # Remember to mount the image cache directory
   -d bjarneo/image-api
 ```

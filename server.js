@@ -18,6 +18,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = 3003;
 const cacheDir = path.join(__dirname, "cache");
+const corsOption = {
+	origin:
+		process.env.CORS_ORIGIN?.split(",").map((origin) => origin.trim()) || "*",
+};
 
 // --- Utility Functions ---
 const generateCacheKey = async (reqBody, fileBuffer) => {
@@ -171,7 +175,7 @@ const handleImageProcessing = async (req, res) => {
 
 // --- Middleware ---
 
-app.use(cors());
+app.use(cors(corsOption));
 app.use(express.json());
 app.use(morgen("combined"));
 const upload = multer({ dest: "uploads/" });
