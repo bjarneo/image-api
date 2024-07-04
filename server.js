@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import morgen from "morgan";
 import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -172,6 +173,7 @@ const handleImageProcessing = async (req, res) => {
 
 app.use(cors());
 app.use(express.json());
+app.use(morgen("combined"));
 const upload = multer({ dest: "uploads/" });
 app.use("/cache", express.static("cache"));
 app.use(
